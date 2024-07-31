@@ -2,6 +2,12 @@
 
 All-hex Nek mesh generator for a single pebble inside a box (or cylinder) container.
 
+| cube sph | sph in box | box | cyl |
+|:---:|:---:|:---:|:---:|
+| <img src='demo_figs/cubesph.png' height="300"> |<img src='demo_figs/sph_in_box.png' height="300">  | <img src='demo_figs/mesh_box.png' height="300"> |<img src='demo_figs/mesh_cyl.png' height="300">  |
+
+---
+
 ### Features
 - sphere in box
 - sphere in tube
@@ -13,10 +19,6 @@ All-hex Nek mesh generator for a single pebble inside a box (or cylinder) contai
 See drivers 
 - `driver_box.m`: box container
 - `driver_cyl.m`: cylinder container
-
-| box | cyl |
-|:---:|:---:|
-| [](demo_figs/mesh_box.png) | [](demo_figs/mesh_cyl.png) |
 
 
 ### (WIP) Code Structure
