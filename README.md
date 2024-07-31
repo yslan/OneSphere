@@ -14,6 +14,10 @@ See drivers
 - `driver_box.m`: box container
 - `driver_cyl.m`: cylinder container
 
+| box | cyl |
+|:---:|:---:|
+| [](demo_figs/mesh_box.png) | [](demo_figs/mesh_cyl.png) |
+
 
 ### (WIP) Code Structure
 
