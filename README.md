@@ -7,7 +7,7 @@ All-hex Nek mesh generator for a single pebble inside a box (or cylinder) contai
 - sphere in tube
 - boundary layers, wall refinement
 - dump vtk files for checking
-- (WIP) high order curves in Nek's sphere and cylinder format.
+- High order curves in Nek's sphere (ok) and cylinder (2nd order via midpt) format.
 
 ### Usage:
 See drivers 
@@ -19,13 +19,14 @@ See drivers
 
 - Basic Workflow
   1. Make the surface mesh for sphere following cubed sphere.
-  2. track the surface, extrude a fer sph boundary layers
-  3. extrude the surface to a box to get "sph in box
-  4. (cyl) extrude to make a fab of cylinder, extrude again for inlet/outlet.
-  4. (box) append box meshes.
+  2. track the surface, extrude a few sph boundary layers
+  3. extrude the surface to a box to get "sph in box"
+  4. Fill the remaining space
+     - (cyl) extrude to make a fab of cylinder, extrude again for inlet/outlet.
+     - (box) append box meshes.
 
 - Structure: fbox 
-  6 faces of the cubed sphere, nbx * nbx Quad elements each.
+  6 faces of the cubed sphere, `nbx * nbx` Quad elements each.
   We track the element id for this "face front" for extrusions
 
   ```
@@ -56,17 +57,29 @@ See drivers
   ```
 
 - Vtk files
+  ```
+  Hexes_<name>       dump hex elements
+  Hexes_<name>_f     dump 6 faces of hex, so we can check the sideset at each stage
+  Hexes_<name>_cbc   same as the _f one, but the values are from (final) CBC
+  ```
 
-- Curves
+- Curves    
+  Sphere curves is easy but Cylinder is tricky.
+  Nek's cyl curve format requires face 5-6 parallel to bottom and top of the cyl. 
+  However, after extrusion, can be on face 6. 
+  Until we extend the Nek's cyl format, the workaround is to use midpt (2nd order, hex20). 
+  Here, we regroup those sidesets and manally reproject the midpt onto the cyl.
 
 - Mesh Checkes
 
-- Boundary Conditiones
+- Boundary Conditiones     
+  At every mesh stage, we also print the setdiff of the existing sideset id.     
+  Then, we manually group those bcid in Hbc and assign the boudaryID via the function `set_cbc`    
 
-- IO for Nek
-  ```
-  X, Hexes, CBC
-  ```
+- IO for Nek     
+  Basic mesh should contain `(X,Hexes,CBC)`     
+  We map the `boundaryID` to a dump BC set `W  ,W01,W02, ...` that can be recovered in `usdat2`.
+  Hcurve is optional with `ifcurve=1` for curved sides.     
 
 ### TODOs
 - clean up

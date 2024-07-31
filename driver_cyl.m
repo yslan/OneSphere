@@ -90,7 +90,7 @@ bc_tmp{2} = [46];          % inlet
 bc_tmp{3} = [56];          % oulet
 bc_tmp{4} = [31,32,33,34]; % side, xmin
 CBC = set_cbc(Hbc,bc_tmp);
-Hcurve = fix_cyl_curve_via_BC(X,Hexes,Hbc,Hcurve,bc_tmp{4});
+Hcurve = fix_cyl_curve_via_BC(X,Hexes,Hbc,Hcurve,bc_tmp{4},Rcyl);
 draw_Hexes_vtk(X,Hexes,CBC,fldr_out,[tag '_cbc'],-2);
 
 % dump re2

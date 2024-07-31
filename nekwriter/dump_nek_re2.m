@@ -147,25 +147,27 @@ else
   ncurv = length(find(curves(1,:,:)>0)); fwrite(fid,ncurv,itype);
   fprintf('    dump_nek_re2 dump curve: %d',ncurv);
 
-  sp='   '; nchk=0;
+  nchk=0;
+  ic_cnt=zeros(3,1);
+  sp_cc='   '; if(wdsize==8); sp_cc='       '; end
   for e=1:nH;
   for iedge=1:nedge
     ictype = curves(1,iedge,e);
     if (ictype>0)
       ctype=' ';
-      if (ictype==1) ctype='m'; end
-      if (ictype==2) ctype='s'; end
-      if (ictype==3) ctype='c'; end
-      dat=curves(2:6,iedge,e);
+      if (ictype==1); ctype='m'; ic_cnt(1)=ic_cnt(1)+1;end
+      if (ictype==2); ctype='s'; ic_cnt(2)=ic_cnt(2)+1;end
+      if (ictype==3); ctype='C'; ic_cnt(3)=ic_cnt(3)+1;end
+      dat=[e,iedge,curves(2:6,iedge,e)'];
       fwrite(fid,dat,dtype);
-      fwrite(fid,[ctype sp],'char*1');
+      fwrite(fid,[ctype sp_cc],'char*1');
       nchk=nchk+1;
     end
   end
   end
 end
 assert(nchk==ncurv,'#curved sides mismatched');
-fprintf('    done !\n');
+fprintf('    done! #(m,s,C) = (%d,%d,%d)\n',ic_cnt(1),ic_cnt(2),ic_cnt(3));
 
 
 %% bdry

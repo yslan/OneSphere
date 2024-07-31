@@ -1,0 +1,13 @@
+.*.swp
+.*.swo
+*log*
+*.state
+SESSION.NAME
+nekbmpi
+nek5000
+*.nek5000
+*0.f0*
+*.fld*
+outputs*/
+obj/
+

@@ -43,8 +43,8 @@ Hnew = zeros(nface*nelf*nlayers,8);
 Hcurve_new = zeros(6,12,nface*nelf*nlayers);
 Hcurve = cat(3,Hcurve,Hcurve_new);
 f_to_eid_3d = [1,5;2,6;3,7;4,8;0,0;0,0];
-fff1 = @(X) 1.0/sqrt(X(:,1).^2+X(:,2).^2);
-fff2 = @(X,R) [X(:,1).*R, X(:,2).*R, X(:,3)]; 
+fff1 = @(X) 1.0 ./ sqrt(X(:,1).^2+X(:,2).^2);
+fff2 = @(X,Ri,rc) [X(:,1).*Ri*rc, X(:,2).*Ri*rc, X(:,3)]; 
 
 nXnow = 0;
 nHnow = 0;
@@ -84,45 +84,49 @@ for f=1:nface
       Hnew((nHnow+1):(nHnow+nQnew),1:4) = Qfab0;
       Hnew((nHnow+1):(nHnow+nQnew),5:8) = Qfab1;
 
+      ih0 = nHtot+1;          % Hexes, total
+      ih1 = nHtot+nQnew;
       if (i==1) % face 5
          if (geom1.type==2) 
-            Hcurve(1,5,(nHnow+1):(nHnow+nQnew)) = 2;
-            Hcurve(2:4,5,(nHnow+1):(nHnow+nQnew)) = 0;
-            Hcurve(5,5,(nHnow+1):(nHnow+nQnew)) = geom1.coef;
+            Hcurve(1,  5,ih0:ih1) = 2;
+            Hcurve(2:4,5,ih0:ih1) = 0;
+            Hcurve(5,  5,ih0:ih1) = geom1.coef;
          elseif (geom1.type==3) 
             % hollow cyl (outside)
             %Hcurve(1:2,f_to_eid_3d(5,1),(nHnow+1):(nHnow+nQnew)) = [3,-geom1.coef];
             %Hcurve(1:2,f_to_eid_3d(5,2),(nHnow+1):(nHnow+nQnew)) = [3,-geom1.coef];
             % midpt
-            ex1 = (Xbot(Qtop(:,1),:)+Xbot(Qtop(:,2),:))/2; rr=fff1(ex1);ex1=fff2(ex1,rr); 
-            ex2 = (Xbot(Qtop(:,2),:)+Xbot(Qtop(:,3),:))/2; rr=fff1(ex2);ex2=fff2(ex2,rr);
-            ex3 = (Xbot(Qtop(:,3),:)+Xbot(Qtop(:,4),:))/2; rr=fff1(ex3);ex3=fff2(ex3,rr);
-            ex4 = (Xbot(Qtop(:,4),:)+Xbot(Qtop(:,1),:))/2; rr=fff1(ex4);ex4=fff2(ex4,rr);
-            Hcurve(1,[1,2,3,4],(nHnow+1):(nHnow+nQnew)) = 1;
-            Hcurve(2:4,1,(nHnow+1):(nHnow+nQnew)) = ex1;
-            Hcurve(2:4,2,(nHnow+1):(nHnow+nQnew)) = ex2;
-            Hcurve(2:4,3,(nHnow+1):(nHnow+nQnew)) = ex3;
-            Hcurve(2:4,4,(nHnow+1):(nHnow+nQnew)) = ex4;
+            Rc=geom1.coef;
+            ex1=(Xbot(Qtop(:,1),:)+Xbot(Qtop(:,2),:))/2;ri=fff1(ex1);ex1=fff2(ex1,ri,Rc); 
+            ex2=(Xbot(Qtop(:,2),:)+Xbot(Qtop(:,3),:))/2;ri=fff1(ex2);ex2=fff2(ex2,ri,Rc);
+            ex3=(Xbot(Qtop(:,3),:)+Xbot(Qtop(:,4),:))/2;ri=fff1(ex3);ex3=fff2(ex3,ri,Rc);
+            ex4=(Xbot(Qtop(:,4),:)+Xbot(Qtop(:,1),:))/2;ri=fff1(ex4);ex4=fff2(ex4,ri,Rc);
+            Hcurve(1,[1,2,3,4],ih0:ih1) = 1;
+            Hcurve(2:4,1,ih0:ih1) = reshape(ex1',3,1,nQnew);
+            Hcurve(2:4,2,ih0:ih1) = reshape(ex2',3,1,nQnew);
+            Hcurve(2:4,3,ih0:ih1) = reshape(ex3',3,1,nQnew);
+            Hcurve(2:4,4,ih0:ih1) = reshape(ex4',3,1,nQnew);
          end
       end
       if (i==nlayers) % face 6
          if (geom2.type==2) 
-            Hcurve(1,6,(nHnow+1):(nHnow+nQnew)) = 2;
-            Hcurve(2:4,6,(nHnow+1):(nHnow+nQnew)) = 0;
-            Hcurve(5,6,(nHnow+1):(nHnow+nQnew)) = geom2.coef;
-         elseif (geom1.type==3) 
+            Hcurve(1,  6,ih0:ih1) = 2;
+            Hcurve(2:4,6,ih0:ih1) = 0;
+            Hcurve(5,  6,ih0:ih1) = geom2.coef;
+         elseif (geom2.type==3) 
             %Hcurve(1:2,f_to_eid_3d(6,1),(nHnow+1):(nHnow+nQnew)) = [3,-geom1.coef];
             %Hcurve(1:2,f_to_eid_3d(6,2),(nHnow+1):(nHnow+nQnew)) = [3,-geom1.coef];
             % midpt
-            ex1 = (Xtop(Qtop(:,1),:)+Xtop(Qtop(:,2),:))/2; rr=fff1(ex1);ex1=fff2(ex1,rr);
-            ex2 = (Xtop(Qtop(:,2),:)+Xtop(Qtop(:,3),:))/2; rr=fff1(ex2);ex2=fff2(ex2,rr);
-            ex3 = (Xtop(Qtop(:,3),:)+Xtop(Qtop(:,4),:))/2; rr=fff1(ex3);ex3=fff2(ex3,rr);
-            ex4 = (Xtop(Qtop(:,4),:)+Xtop(Qtop(:,1),:))/2; rr=fff1(ex4);ex4=fff2(ex4,rr);
-            Hcurve(1,[5,6,7,8],(nHnow+1):(nHnow+nQnew)) = 1;
-            Hcurve(2:4,5,(nHnow+1):(nHnow+nQnew)) = ex1;
-            Hcurve(2:4,6,(nHnow+1):(nHnow+nQnew)) = ex2;
-            Hcurve(2:4,7,(nHnow+1):(nHnow+nQnew)) = ex3;
-            Hcurve(2:4,8,(nHnow+1):(nHnow+nQnew)) = ex4;
+            Rc=geom2.coef;
+            ex1=(Xtop(Qtop(:,1),:)+Xtop(Qtop(:,2),:))/2;ri=fff1(ex1);ex1=fff2(ex1,ri,Rc);
+            ex2=(Xtop(Qtop(:,2),:)+Xtop(Qtop(:,3),:))/2;ri=fff1(ex2);ex2=fff2(ex2,ri,Rc);
+            ex3=(Xtop(Qtop(:,3),:)+Xtop(Qtop(:,4),:))/2;ri=fff1(ex3);ex3=fff2(ex3,ri,Rc);
+            ex4=(Xtop(Qtop(:,4),:)+Xtop(Qtop(:,1),:))/2;ri=fff1(ex4);ex4=fff2(ex4,ri,Rc);
+            Hcurve(1,[5,6,7,8],ih0:ih1) = 1;
+            Hcurve(2:4,5,ih0:ih1) = reshape(ex1',3,1,nQnew);
+            Hcurve(2:4,6,ih0:ih1) = reshape(ex2',3,1,nQnew);
+            Hcurve(2:4,7,ih0:ih1) = reshape(ex3',3,1,nQnew);
+            Hcurve(2:4,8,ih0:ih1) = reshape(ex4',3,1,nQnew);
          end
       end
 

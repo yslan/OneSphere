@@ -32,6 +32,7 @@ Hcurve = zeros(6,12,nelf*nlayers);
 nXnow = 0;
 nHnow = 0;
 nXtot = size(X,1);
+nHtot = 0;
 for f=1:6
 
    Qface = Quad(Qface_front(:,f),:);
@@ -61,16 +62,19 @@ for f=1:6
       end
       Xnew((nXnow+1):(nXnow+nXnew),:) = Xtmp * rad;
 
-      Hcurve(1,5,(nHnow+1):(nHnow+nQnew)) = 2;
-      Hcurve(2:4,5,(nHnow+1):(nHnow+nQnew)) = 0;
-      Hcurve(5,5,(nHnow+1):(nHnow+nQnew)) = rad0;
-      Hcurve(1,6,(nHnow+1):(nHnow+nQnew)) = 2;
-      Hcurve(2:4,6,(nHnow+1):(nHnow+nQnew)) = 0;
-      Hcurve(5,6,(nHnow+1):(nHnow+nQnew)) = rad1;
+      ih0 = nHtot+1;          % Hexes, total
+      ih1 = nHtot+nQnew;
+      Hcurve(1,  5,ih0:ih1) = 2;
+      Hcurve(2:4,5,ih0:ih1) = 0;
+      Hcurve(5,  5,ih0:ih1) = rad0;
+      Hcurve(1,  6,ih0:ih1) = 2;
+      Hcurve(2:4,6,ih0:ih1) = 0;
+      Hcurve(5,  6,ih0:ih1) = rad1;
 
       nHnow = nHnow + nQnew;
       nXnow = nXnow + nXnew;
       nXtot = nXtot + nXnew;
+      nHtot = nHtot + nQnew;
       Qfab0 = Qfab1;
       rad0 = rad1;
    end

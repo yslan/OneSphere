@@ -1,0 +1,31 @@
+#
+# nek parameter file
+#
+[GENERAL] 
+dt = 1e-04
+timeStepper = bdf3 #bdf2
+numSteps = 1000
+writeInterval = 100
+
+#extrapolation = OIFS
+
+[MESH]
+numberOfBCFields = 2
+
+[PRESSURE]
+#preconditioner = semg_amg
+residualTol = 1e-04
+#residualProj = no
+
+[VELOCITY]
+residualTol = 1e-6
+#residualProj = no
+density = 1
+viscosity = -100
+
+[TEMPERATURE]
+rhocp = 1.0
+conductivity = -100
+residualtol = 1e-06
+
+
